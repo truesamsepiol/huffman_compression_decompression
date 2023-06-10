@@ -27,4 +27,4 @@
 
 	2- pour la decompression
 		2.1 compiler le code source: gcc huffman_decompression.c
-		2.2 ./a.out chemin/vers/la/cle  chemin/vers/fichier/compresse
+		2.2 ./a.out chemin/vers/fichier/compresse chemin/vers/la/cle  
