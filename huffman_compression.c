@@ -26,6 +26,8 @@ int noeudParent[TAILLE_TABLEAU];
 
 int nbTotalCaractere = 0;
 
+int nbCaractereUnique = 0;
+
 char *texte;
 
 /*
@@ -72,6 +74,9 @@ void compterOccurenceMot(char *cheminVersFichier){
         	int indice = caractereLu - PREMIER_CARACTERE; //indice represente l'indice du caractere lu dans le tableau
         	if(indice >= 0 && indice < TAILLE_TABLEAU)
 		{
+			if(alphabet[indice].occurence == 0)
+				nbCaractereUnique++;
+
             		alphabet[indice].occurence++;         
 			nbTotalCaractere++;
 		}
@@ -146,10 +151,12 @@ void construireArbre(){
 /* Ecrire les frequences dans un fichier */
 void enregistrerFrequence()
 {
-	FILE *fichierArbre = fopen("frequences", "w");
+	FILE *fichierArbre = fopen("cleDecompression", "w");
+	fprintf(fichierArbre, "%d\n", nbCaractereUnique);
 	for(int indice = 0; indice < TAILLE_TABLEAU; indice++)
 		if(alphabet[indice].occurence != 0)
            		fprintf(fichierArbre, "%c %d\n", alphabet[indice].caractere + PREMIER_CARACTERE, alphabet[indice].occurence);	
+	fclose(fichierArbre);
 }
 
 /* Sortir le fichier compresse */
@@ -189,7 +196,7 @@ void enregistrerFichierCompresser(char *cheminVersFichier)
 	printf("\n		Compression terminee avec SUCESS		\n");
 	printf("\n\nLes fichier suivant ont ete genere:\n");
 	printf("		1- fichierCompresse : contient le texte compresse\n");
-	printf("		2- frequences	    : la cle qui va permettre de decompresser\n\n");
+	printf("		2- cleDecompression : la cle qui va permettre de decompresser\n\n");
 }
 
 
