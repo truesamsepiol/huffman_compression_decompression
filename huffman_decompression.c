@@ -29,6 +29,7 @@ int nbOccurence = 0;
 
 char *texte;
 
+FILE *sortie;
 
 /*
 cette fonction permet d'initialiser le tableau de l'alphabet
@@ -79,6 +80,29 @@ void lireCleDecompression(char *cheminVersFichier){
     :return -> un autre tableau qui contient les racines de notre arbre - suivant le principe de huffman 
 */
 
+int trouveFeuille(int feuilleTemp, int racineTemp, char caractere)
+{
+	if(caractere == '0')
+	{
+		if(alphabet[feuilleTemp].occurence < noeudParent[racineTemp - 1])
+			return 1;
+	}
+	else
+	{
+		if(alphabet[feuilleTemp].occurence > noeudParent[racineTemp - 1])
+			return 1;
+	}
+	return 0;
+}
+
+void compareFeuille(int feuilleTemp, char caractere)
+{	
+	if(caractere == '0')
+		fprintf(sortie, "%c", alphabet[feuilleTemp - 1].caractere);
+	else
+		fprintf(sortie, "%c", alphabet[feuilleTemp].caractere);
+}
+
 void construireArbre(char *cheminVersFichierCompresse){
    	int feuille = 0, racine = 0, k; 
 
@@ -104,18 +128,33 @@ void construireArbre(char *cheminVersFichierCompresse){
 
 	FILE *fichierCompresse = fopen(cheminVersFichierCompresse, "r");
 	char bit;
+	int racineTemp = racine;
+	int feuilleTemp = feuille;
 	while((bit = fgetc(fichierCompresse)) != EOF)
-	{	
-		int racineTmp = racine;
-		int feuilleTmp = feuille;
-	    	/*while(racineTmp >= 1)
+	{
+		int gauche, droite;
+		gauche = feuilleTemp;
+		droite = racineTemp;
+
+		if(racineTemp == 0)
 		{
-
-        		feuille--;
-	        	racine--; 
-    		}*/
+			compareFeuille(feuilleTemp, bit);
+			racineTemp = racine;
+			feuilleTemp = feuille;
+		}
+		else if(trouveFeuille(gauche, droite, bit))
+		{
+			fprintf(sortie, "%c", alphabet[feuilleTemp].caractere);
+			racineTemp = racine;
+			feuilleTemp = feuille;
+		}
+		else
+		{
+			racineTemp--;
+			feuilleTemp--;
+		}
 	}
-
+	printf("\n");
 	fclose(fichierCompresse);
 
 }
@@ -127,8 +166,10 @@ int main(int nbArgument, char *parametres[])
         	printf("Usage: %s chemin/vers/fichier/compresse chemin/vers/cle/decompression \n\n", parametres[0]);
         	exit(1);
     	}
+	sortie = fopen("sortie", "w");
 	initialisationTableauAlphabet();
     	lireCleDecompression(parametres[2]);
     	construireArbre(parametres[1]);    
+	fclose(sortie);
     	return 0;
 }
