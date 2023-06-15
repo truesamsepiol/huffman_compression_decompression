@@ -2,15 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TAILLE_TABLEAU 95   //pour ne traiter que les caracteres imprimable du code ascii
-#define PREMIER_CARACTERE 32    
+#define TAILLE_TABLEAU 128   //pour ne traiter que les caracteres imprimable du code ascii
 
-#define FICHIEROCCURENCE "caractereOccurence.txt"
 
 typedef struct caractereOccurence{
 	char caractere;
 	int occurence;
 	char code[TAILLE_TABLEAU];
+	char arc;
 }caractereOccurence;
 
 /*
@@ -36,7 +35,8 @@ cette fonction permet d'initialiser le tableau de l'alphabet
 - Lors de l'initialisation, les caracteres de chaque case correspondent aux indices du tableau et les occurences sont mis a 0 pour tout le monde
 Tout ceci pour nous faciliter la manipulation. 
 */
-void initialisationTableauAlphabet(){
+void initialisationTableauAlphabet()
+{
 	for(int indice = 0; indice < TAILLE_TABLEAU; indice++)
 	{	
         	alphabet[indice].caractere = indice;
@@ -49,7 +49,8 @@ void initialisationTableauAlphabet(){
 /* 
  * lire le contenu de la cle de decompression et inscrire dans l'alphabet
 */
-void lireCleDecompression(char *cheminVersFichier){
+void lireCleDecompression(char *cheminVersFichier)
+{
 	char caractereLu;
     	FILE *fichierADecompresser;
     	if ((fichierADecompresser = fopen(cheminVersFichier,"r")) == NULL){
@@ -62,12 +63,13 @@ void lireCleDecompression(char *cheminVersFichier){
 	nbOccurence = nbLignes;
 	for(int ligne = 0; ligne < nbLignes; ligne++)
 	{
-		char caractere;
+		int caractere;
 		int occurence;
 
-		fscanf(fichierADecompresser, "%c %d\n", &caractere, &occurence);
-		alphabet[ligne].caractere = caractere;
+		fscanf(fichierADecompresser, "%d %d\n", &caractere, &occurence);
+		alphabet[ligne].caractere = (char)caractere;
 		alphabet[ligne].occurence = occurence;
+		printf("caractere en entier == %d , caractere en ascii == %c et nbOccurence == %d\n", caractere, (char)caractere, occurence); 
 
 	}
     	fclose(fichierADecompresser);
@@ -84,12 +86,12 @@ int trouveFeuille(int feuilleTemp, int racineTemp, char caractere)
 {
 	if(caractere == '0')
 	{
-		if(alphabet[feuilleTemp].occurence < noeudParent[racineTemp - 1])
+		if(alphabet[feuilleTemp].arc == '0')
 			return 1;
 	}
 	else
 	{
-		if(alphabet[feuilleTemp].occurence > noeudParent[racineTemp - 1])
+		if(alphabet[feuilleTemp].arc == '1')
 			return 1;
 	}
 	return 0;
@@ -103,7 +105,8 @@ void compareFeuille(int feuilleTemp, char caractere)
 		fprintf(sortie, "%c", alphabet[feuilleTemp].caractere);
 }
 
-void construireArbre(char *cheminVersFichierCompresse){
+void construireArbre(char *cheminVersFichierCompresse)
+{
    	int feuille = 0, racine = 0, k; 
 
     	printf("\nDebut de la construction de l'arbre\n\n");
@@ -113,10 +116,17 @@ void construireArbre(char *cheminVersFichierCompresse){
        		racine = feuille;
     	else
 	{
+		alphabet[feuille].arc = '0';
+		alphabet[feuille + 1].arc = '1';
         	noeudParent[racine] = alphabet[feuille].occurence + alphabet[feuille + 1].occurence;
         	racine++;
         	for(k = feuille+2; k < nbOccurence; k++)
 		{
+			if(noeudParent[racine - 1] > alphabet[k].occurence)
+				alphabet[k].arc = '0';
+			else
+				alphabet[k].arc = '1';
+
             		noeudParent[racine] = alphabet[k].occurence + noeudParent[racine -1];
             		racine++;
         	}
@@ -162,7 +172,8 @@ void construireArbre(char *cheminVersFichierCompresse){
 
 int main(int nbArgument, char *parametres[])
 {
-    	if(nbArgument != 3){
+    	if(nbArgument != 3)
+	{
         	printf("Usage: %s chemin/vers/fichier/compresse chemin/vers/cle/decompression \n\n", parametres[0]);
         	exit(1);
     	}

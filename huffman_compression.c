@@ -2,10 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TAILLE_TABLEAU 95   //pour ne traiter que les caracteres imprimable du code ascii
-#define PREMIER_CARACTERE 32    
+#define TAILLE_TABLEAU 128   //pour ne traiter que les caracteres imprimable du code ascii
 
-#define FICHIEROCCURENCE "caractereOccurence.txt"
 
 typedef struct caractereOccurence{
 	char caractere;
@@ -71,18 +69,15 @@ void compterOccurenceMot(char *cheminVersFichier){
       		exit(1);
     	}
     	while ((caractereLu = fgetc(fichierACompressser)) != EOF){
-        	int indice = caractereLu - PREMIER_CARACTERE; //indice represente l'indice du caractere lu dans le tableau
-        	if(indice >= 0 && indice < TAILLE_TABLEAU)
 		{
-			if(alphabet[indice].occurence == 0)
+			if(alphabet[caractereLu].occurence == 0)
 				nbCaractereUnique++;
 
-            		alphabet[indice].occurence++;         
+            		alphabet[caractereLu].occurence++;         
 			nbTotalCaractere++;
 		}
     	}
     	fclose(fichierACompressser);
-
     	// La fonction de la bibliothèque C void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)) trie un tableau.
     	/*Elle va donc nous permettre de trier notre tableau de caractere dans l'ordre croissant du nombre d'occurence*/
     	qsort(alphabet, TAILLE_TABLEAU, sizeof(caractereOccurence), fonctionDeComparaison);
@@ -144,7 +139,9 @@ void construireArbre(){
 
     	for(int indice = 0; indice < TAILLE_TABLEAU; indice++)
        		if(alphabet[indice].occurence != 0)
-           		printf("id == %d, caractere == %c , nboccurence == %d, code == %s\n", indice, alphabet[indice].caractere + PREMIER_CARACTERE, alphabet[indice].occurence, alphabet[indice].code);
+           		printf("id == %d, caractere == %c , nboccurence == %d, code == %s\n", indice, alphabet[indice].caractere, alphabet[indice].occurence, alphabet[indice].code);
+
+
     	printf("\nFin de construction des codes\n\n");
 }
 
@@ -154,8 +151,14 @@ void enregistrerFrequence()
 	FILE *fichierArbre = fopen("cleDecompression", "w");
 	fprintf(fichierArbre, "%d\n", nbCaractereUnique);
 	for(int indice = 0; indice < TAILLE_TABLEAU; indice++)
+	{
 		if(alphabet[indice].occurence != 0)
-           		fprintf(fichierArbre, "%c %d\n", alphabet[indice].caractere + PREMIER_CARACTERE, alphabet[indice].occurence);	
+		{
+			char caractere = alphabet[indice].caractere;
+			int occurence = alphabet[indice].occurence;
+           		fprintf(fichierArbre, "%d %d\n", caractere, occurence);	
+		}
+	}
 	fclose(fichierArbre);
 }
 
@@ -168,23 +171,22 @@ void enregistrerFichierCompresser(char *cheminVersFichier)
       		fprintf(stderr, "\nErreur: Impossible de lire le fichier %s\n",cheminVersFichier);
  	     	exit(1);
     	}
-
+	printf("nombre total de caractere == %d\n", nbTotalCaractere);
 	texte = malloc(sizeof(char) * nbTotalCaractere);
-	char car = 0;
-    	while ((caractereLu = fgetc(fichierACompressser)) != EOF){
-        	int indice = caractereLu - PREMIER_CARACTERE; //indice represente l'indice du caractere lu dans le tableau
-        	if(indice >= 0 && indice < TAILLE_TABLEAU)
-			texte[car++] = caractereLu;
+	unsigned int car = 0;
+    	while ((caractereLu = fgetc(fichierACompressser)) != EOF)
+		texte[car++] = caractereLu;
 
-    	}
-	texte[car] = '\0';
     	fclose(fichierACompressser);
+
 
 	FILE *fichierCompresse = fopen("fichierCompresse", "w");
 
+	printf("nombre total caractere == %d\n", nbTotalCaractere);
+
 	for(car = 0; car < nbTotalCaractere; car++)
 	{
-		int indice = texte[car] - PREMIER_CARACTERE;
+		int indice = texte[car];
 		int id = TAILLE_TABLEAU;
 		while(alphabet[id].caractere != indice)
 			id--;
