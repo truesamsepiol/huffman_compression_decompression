@@ -267,5 +267,7 @@ int main(int nbArg, char *arguments[])
 	printf("			Entree %d bits\n", nombreBitsEntree);	
 	printf("			Sortie %d bits\n", nombreBitsSortie);
 	printf("			Economie d'environ %d%%\n", (int)economie);
+	printf("\n		Chemin vers la cle de decompression \"%s\"\n", cle);
+	printf("		Chemin vers le fichier compresse    \"%s\"\n\n", fichierCompresse);
 	return 0;
 }
