@@ -245,18 +245,16 @@ int main(int nbArg, char *arguments[])
 		exit(0);
 	}
 
-	char chaine[CARDINAL];
-
 	initialisation();
 	compteOccurences(arguments[1]);
 	generationCleDecompression();
 	huffman();
 
-	printf("\n			Debut construction des prefices codes\n");
+	printf("\n			Debut construction des prefixes codes\n");
 	printf("			         ...............\n");
 	constructionDuCode(racine, "");
 	printf("			         ...............\n");
-	printf("			Fin construction des prefices codes\n");
+	printf("			Fin construction des prefixes codes\n");
 	
 
 	afficherCode();
