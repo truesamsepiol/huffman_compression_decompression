@@ -18,12 +18,7 @@ typedef struct caractereOccurences
 caractereOccurences alphabet[CARDINAL];
 caractereOccurences *racine;
 
-int nbTotalCaracteres = 0; //total de caractere dans le fichier
 int caracteresApparus = 0; //Total de caractere reelement apparu
-int nombreBitsEntree = 0; //Nombre de bit en sortie
-int nombreBitsSortie = 0; //Nombre de bit en sortie
-
-char code[] = "";
 char *fichierDecompresse = "fichierDecompresse"; //chemin vers le fichier decompresse
 
 //Mettre toutes les occurences a zero
